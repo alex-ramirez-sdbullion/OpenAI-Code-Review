@@ -34,6 +34,20 @@ export class Main {
                 .filter((prompt: string) => prompt.length > 0)
             : undefined;
 
+        const maxChunksPerFile = (() => {
+            const raw = tl.getInput('max_chunks_per_file', false);
+            const n = raw ? parseInt(raw, 10) : NaN;
+            if (!isFinite(n) || n <= 0) return 20;
+            return Math.min(50, n);
+        })();
+
+        const tokenBuffer = (() => {
+            const raw = tl.getInput('token_buffer', false);
+            const n = raw ? parseInt(raw, 10) : NaN;
+            if (!isFinite(n) || n < 0) return 1200;
+            return Math.min(8000, n);
+        })();
+
         const provider = aiProvider === 'azure-openai' ? 'azure-openai' : 'openai';
 
         let openAiClient: OpenAI;
@@ -78,7 +92,17 @@ export class Main {
             modelOrDeployment = tl.getInput('ai_model', true)!;
         }
 
-        this._chatGpt = new ChatGPT(openAiClient, provider, modelOrDeployment, tl.getBoolInput('bugs', true), tl.getBoolInput('performance', true), tl.getBoolInput('best_practices', true), additionalPrompts);
+        this._chatGpt = new ChatGPT(
+            openAiClient,
+            provider,
+            modelOrDeployment,
+            tl.getBoolInput('bugs', true),
+            tl.getBoolInput('performance', true),
+            tl.getBoolInput('best_practices', true),
+            additionalPrompts,
+            maxChunksPerFile,
+            tokenBuffer
+        );
         this._repository = new Repository();
         this._pullRequest = new PullRequest();
 

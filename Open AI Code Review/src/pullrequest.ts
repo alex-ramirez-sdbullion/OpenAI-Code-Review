@@ -1,19 +1,13 @@
 import * as tl from "azure-pipelines-task-lib/task";
-import { Agent } from "https";
 
 export class PullRequest {
-    private _httpsAgent: Agent;
 
     private _collectionUri: string = tl.getVariable('System.TeamFoundationCollectionUri')!;
     private _teamProjectId: string = tl.getVariable('System.TeamProjectId')!;
     private _repositoryName: string = tl.getVariable('Build.Repository.Name')!;
     private _pullRequestId: string = tl.getVariable('System.PullRequest.PullRequestId')!;
 
-    constructor() {
-        this._httpsAgent = new Agent({
-            rejectUnauthorized: false
-        });
-    }
+    constructor() {}
 
     public async AddComment(fileName: string, comment: string): Promise<boolean> {
 
@@ -49,7 +43,7 @@ export class PullRequest {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${tl.getVariable('System.AccessToken')}`, 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
-            agent: this._httpsAgent
+            
         });
 
         if (response.ok == false) {
@@ -68,8 +62,7 @@ export class PullRequest {
 
         let response = await fetch(removeCommentUrl, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${tl.getVariable('System.AccessToken')}`, 'Content-Type': 'application/json' },
-            agent: this._httpsAgent
+            headers: { 'Authorization': `Bearer ${tl.getVariable('System.AccessToken')}`, 'Content-Type': 'application/json' }
         });
 
         if (response.ok == false) {
@@ -97,8 +90,7 @@ export class PullRequest {
     public async GetThreads(): Promise<never[]> {
         let threadsEndpoint = `${this._collectionUri}${this._teamProjectId}/_apis/git/repositories/${this._repositoryName}/pullRequests/${this._pullRequestId}/threads?api-version=7.1`;
         let threadsResponse = await fetch(threadsEndpoint, {
-            headers: { 'Authorization': `Bearer ${tl.getVariable('System.AccessToken')}`, 'Content-Type': 'application/json' },
-            agent: this._httpsAgent
+            headers: { 'Authorization': `Bearer ${tl.getVariable('System.AccessToken')}`, 'Content-Type': 'application/json' }
         });
 
         if (threadsResponse.ok == false) {
@@ -112,8 +104,7 @@ export class PullRequest {
     public async GetComments(thread: any): Promise<any> {
         let commentsEndpoint = `${this._collectionUri}${this._teamProjectId}/_apis/git/repositories/${this._repositoryName}/pullRequests/${this._pullRequestId}/threads/${thread.id}/comments?api-version=7.1`;
         let commentsResponse = await fetch(commentsEndpoint, {
-            headers: { 'Authorization': `Bearer ${tl.getVariable('System.AccessToken')}`, 'Content-Type': 'application/json' },
-            agent: this._httpsAgent
+            headers: { 'Authorization': `Bearer ${tl.getVariable('System.AccessToken')}`, 'Content-Type': 'application/json' }
         });
 
         if (commentsResponse.ok == false) {

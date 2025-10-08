@@ -45,6 +45,22 @@
             "helpMarkDown": "Choose the OpenAI model for analysis. For best cost/performance use `gpt-4o-mini`. Use `gpt-4o` for highest quality."
         },
         {
+            "name": "max_chunks_per_file",
+            "type": "string",
+            "label": "Max chunks per file",
+            "defaultValue": "20",
+            "required": false,
+            "helpMarkDown": "Limits how many request chunks a single file's diff may be split into. Higher values increase cost and latency. Default is 20."
+        },
+        {
+            "name": "token_buffer",
+            "type": "string",
+            "label": "Token buffer (reserved)",
+            "defaultValue": "1200",
+            "required": false,
+            "helpMarkDown": "Reserve tokens for system prompts and responses when chunking. Default 1200. Increase if responses are truncated; decrease for larger diff chunks."
+        },
+        {
             "name": "azureEndpoint",
             "type": "string",
             "label": "Azure OpenAI Endpoint",

@@ -49,6 +49,9 @@ jobs:
       aiProvider: 'openai'
       api_key: $(OpenAI_ApiKey)
       ai_model: 'gpt-4o-mini'
+      # Optional advanced controls
+      # max_chunks_per_file: '20'    # cap chunk count per file
+      # token_buffer: '1200'         # reserved tokens per request
       bugs: true
       performance: true
       best_practices: true
@@ -72,6 +75,8 @@ jobs:
     bugs: true
     performance: true
     best_practices: true
+    # max_chunks_per_file: '20'
+    # token_buffer: '1200'
 ```
 
 Ensure the deployment name matches what you configured in Azure OpenAI Studio and that the API version is supported for that deployment.
@@ -108,6 +113,7 @@ If you would like to contribute to the development of this extension, please fol
 - Insufficient permissions: Grant the Project Build Service the "Contribute to pull requests" permission on the repo.
 - Node handler mismatch: The task relies on Node 20 for the global `fetch`. Ensure your pipeline agent supports Node 20; otherwise add `node-fetch@2` and re-enable its import.
 - No files reviewed: When using `file_extensions`, provide comma-separated extensions like `ts,js,cs` (with or without leading dots). Excludes should be plain file names, comma-separated.
+- Context limits and chunking: The task estimates token counts and automatically splits large diffs into chunk-sized requests under your model’s context window. Defaults are model-aware (e.g., `gpt-4o`/`gpt-4o-mini`/`gpt-4-turbo` ~128k; legacy `gpt-3.5-turbo` ~4k/16k). If a single line exceeds the window, we truncate that line safely. If very large files still cause issues, narrow `file_extensions` or split changes across commits. Tune with `max_chunks_per_file` (cost/latency control) and `token_buffer` (reserve room for prompts/answers).
 
 ## Build and Package
 
@@ -125,6 +131,7 @@ Follow these steps to build the task (TypeScript → JavaScript) and create a VS
 - `cd "Open AI Code Review/src"`
 - `npm install`
 - `npm run build`  (generates `main.js` in the same folder)
+- (Optional) Reduce VSIX size: `npm prune --production` to remove devDependencies before packaging
 
 3) Package the extension
 

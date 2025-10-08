@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "oaicrsdb",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Open AI Code Review",
     "publisher": "SDDepositoryLLC",
     "public": true,
