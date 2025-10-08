@@ -19,41 +19,64 @@ Enhance your development workflow with Open AI Code Review. Start receiving inte
 ## Prerequisites
 
 - [Azure DevOps Account](https://dev.azure.com/)
-- [Open AI API Key](https://platform.openai.com/docs/overview)
+- An AI provider credential:
+  - [OpenAI API Key](https://platform.openai.com/docs/overview), or
+  - [Azure OpenAI resource with API key](https://learn.microsoft.com/azure/ai-services/openai/how-to/create-resource)
 
 ## Getting started
 
 1. Install the Open AI Code Review DevOps Extension from the [Azure DevOps Marketplace]([https://marketplace.visualstudio.com/azuredevops](https://marketplace.visualstudio.com/items?itemName=AidanCole.oaicr)).
-2. Add Open AI Code Review Task to Your Pipeline:
+1. Add Open AI Code Review Task to Your Pipeline. Use the following example configuration:
 
-   ```yaml
-   trigger:
-     branches:
-       exclude:
-         - '*'
+```yaml
+trigger:
+  branches:
+    exclude:
+      - '*'
 
-   pr:
-     branches:
-       include:
-         - '*'
+pr:
+  branches:
+    include:
+      - '*'
 
-   jobs:
-   - job: CodeReview
-     pool:
-       vmImage: 'ubuntu-latest'
-     steps:
-     - task: OpenAICodeReviewTask@1
-       inputs:
-         api_key: $(OpenAI_ApiKey)
-         ai_model: 'gpt-3.5-turbo'
-         bugs: true
-         performance: true
-         best_practices: true
-         file_extensions: 'js,ts,css,html'
-         file_excludes: 'file1.js,file2.py,secret.txt'
-         additional_prompts: 'Fix variable naming, Ensure consistent indentation, Review error handling approach'`
+jobs:
+- job: CodeReview
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: OpenAICodeReviewTask@1
+    inputs:
+      aiProvider: 'openai'
+      api_key: $(OpenAI_ApiKey)
+      ai_model: 'gpt-3.5-turbo'
+      bugs: true
+      performance: true
+      best_practices: true
+      file_extensions: 'js,ts,css,html'
+      file_excludes: 'file1.js,file2.py,secret.txt'
+      additional_prompts: 'Fix variable naming, Ensure consistent indentation, Review error handling approach'
+```
+
+> 💡 Store API keys in secure pipeline variables or Azure Key Vault secrets and reference them here instead of hardcoding values.
+
+1. (Optional) Configure Azure OpenAI instead of the public OpenAI service:
+
+```yaml
+- task: OpenAICodeReviewTask@1
+  inputs:
+    aiProvider: 'azure-openai'
+    api_key: $(AzureOpenAI_ApiKey)
+    azureEndpoint: 'https://my-resource.openai.azure.com'
+    azureDeployment: 'gpt-4o'
+    azureApiVersion: '2024-02-15-preview'
+    bugs: true
+    performance: true
+    best_practices: true
+```
+
+Ensure the deployment name matches what you configured in Azure OpenAI Studio and that the API version is supported for that deployment.
    
-3. If you do not already have Build Validation configured for your branch already add [Build validation](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops&tabs=browser#build-validation) to your branch policy to trigger the code review when a Pull Request is created
+1. If you do not already have Build Validation configured for your branch already add [Build validation](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops&tabs=browser#build-validation) to your branch policy to trigger the code review when a Pull Request is created
 
 ## FAQ
 

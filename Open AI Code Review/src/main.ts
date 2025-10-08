@@ -21,11 +21,64 @@ export class Main {
         }
 
         const apiKey = tl.getInput('api_key', true)!;
+    const aiProvider = (tl.getInput('aiProvider', false) ?? 'openai').toLowerCase();
+    const azureEndpoint = tl.getInput('azureEndpoint', false)?.trim();
+    const azureDeployment = tl.getInput('azureDeployment', false)?.trim();
+    const azureApiVersion = tl.getInput('azureApiVersion', false)?.trim();
         const fileExtensions = tl.getInput('file_extensions', false);
         const filesToExclude = tl.getInput('file_excludes', false);
-        const additionalPrompts = tl.getInput('additional_prompts', false)?.split(',')
-        
-        this._chatGpt = new ChatGPT(new OpenAI({ apiKey: apiKey }), tl.getBoolInput('bugs', true), tl.getBoolInput('performance', true), tl.getBoolInput('best_practices', true), additionalPrompts);
+        const additionalPromptInput = tl.getInput('additional_prompts', false);
+        const additionalPrompts = additionalPromptInput
+            ? additionalPromptInput.split(',')
+                .map((prompt: string) => prompt.trim())
+                .filter((prompt: string) => prompt.length > 0)
+            : undefined;
+
+        const provider = aiProvider === 'azure-openai' ? 'azure-openai' : 'openai';
+
+        let openAiClient: OpenAI;
+        let modelOrDeployment: string;
+
+        if (provider === 'azure-openai') {
+            if (!azureEndpoint || !azureDeployment) {
+                tl.setResult(tl.TaskResult.Failed, "Azure OpenAI endpoint and deployment name are required when using the Azure OpenAI provider.");
+                return;
+            }
+
+            let normalizedEndpoint: string;
+            try {
+                const parsed = new URL(azureEndpoint);
+                if (parsed.protocol !== 'https:') {
+                    tl.setResult(tl.TaskResult.Failed, "The Azure OpenAI endpoint must use HTTPS (e.g. https://my-resource.openai.azure.com).");
+                    return;
+                }
+                const trimmedPath = parsed.pathname.replace(/\/$/, '').replace(/\/(openai)(\/deployments.*)?$/i, '');
+                normalizedEndpoint = `${parsed.origin}${trimmedPath}`;
+            } catch (error) {
+                tl.setResult(tl.TaskResult.Failed, "The Azure OpenAI endpoint must be a valid HTTPS URL (e.g. https://my-resource.openai.azure.com).");
+                return;
+            }
+
+            const baseUrl = `${normalizedEndpoint.replace(/\/$/, '')}/openai/deployments/${azureDeployment}`;
+
+            openAiClient = new OpenAI({
+                apiKey: apiKey,
+                baseURL: baseUrl,
+                defaultQuery: {
+                    'api-version': azureApiVersion ?? '2024-02-15-preview'
+                },
+                defaultHeaders: {
+                    'api-key': apiKey
+                }
+            });
+
+            modelOrDeployment = azureDeployment;
+        } else {
+            openAiClient = new OpenAI({ apiKey: apiKey });
+            modelOrDeployment = tl.getInput('ai_model', true)!;
+        }
+
+        this._chatGpt = new ChatGPT(openAiClient, provider, modelOrDeployment, tl.getBoolInput('bugs', true), tl.getBoolInput('performance', true), tl.getBoolInput('best_practices', true), additionalPrompts);
         this._repository = new Repository();
         this._pullRequest = new PullRequest();
 

@@ -16,10 +16,21 @@
         {
             "name": "api_key",
             "type": "string",
-            "label": "Open AI API Key",
+            "label": "AI API Key",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "API Key for Open AI API. "
+            "helpMarkDown": "Provide the API key for your chosen AI provider. Store secrets in a secure variable or Azure Key Vault and reference them here."
+        },
+        {
+            "name": "aiProvider",
+            "type": "pickList",
+            "label": "AI Provider",
+            "defaultValue": "openai",
+            "options": {
+                "openai": "OpenAI",
+                "azure-openai": "Azure OpenAI"
+            },
+            "helpMarkDown": "Select the provider to run your reviews.\n\n- **OpenAI:** Use the public OpenAI API. Requires a valid model selection below.\n- **Azure OpenAI:** Use an Azure OpenAI resource. Requires the endpoint, deployment name, and API version inputs."
         },
         {
             "name": "ai_model",
@@ -42,7 +53,31 @@
                 "gpt-3.5-turbo-0613": "gpt-3.5-turbo-0613",
                 "gpt-3.5-turbo-16k-0613": "gpt-3.5-turbo-16k-0613"
             },
-            "helpMarkDown": "## OpenAI API Model Configuration\n\n### Description\nChoose the Open AI API model for code analysis. The selected model determines the depth and capabilities of the code review performed by Open AI.\n\n### Options\n- **gpt-4-1106-preview:** Preview version of GPT-4 released on June 11, 202x.\n- **gpt-4-vision-preview:** Preview version of GPT-4 with enhanced vision capabilities.\n- **gpt-4:** Latest stable release of GPT-4.\n- **gpt-4-0314:** GPT-4 version released on March 14, 202x.\n- **gpt-4-0613:** GPT-4 version released on June 13, 202x.\n- **gpt-4-32k:** GPT-4 version with a 32k parameter size.\n- **gpt-4-32k-0314:** GPT-4 version with 32k parameters, released on March 14, 202x.\n- **gpt-4-32k-0613:** GPT-4 version with 32k parameters, released on June 13, 202x.\n- **gpt-3.5-turbo-1106:** Preview version of GPT-3.5 Turbo released on November 6, 202x.\n- **gpt-3.5-turbo:** Latest stable release of GPT-3.5 Turbo.\n- **gpt-3.5-turbo-16k:** GPT-3.5 Turbo version with a 16k parameter size.\n- **gpt-3.5-turbo-0301:** GPT-3.5 Turbo version released on March 1, 202x.\n- **gpt-3.5-turbo-0613:** GPT-3.5 Turbo version released on June 13, 202x.\n- **gpt-3.5-turbo-16k-0613:** GPT-3.5 Turbo version with 16k parameters, released on June 13, 202x.\n\n### Default Value\nThe default Open AI API model is set to **gpt-3.5-turbo**.\n\n Choose the model that best suits your code review requirements."
+            "helpMarkDown": "## OpenAI API Model Configuration\n\nChoose the OpenAI model for code analysis. This setting is only used when **AI Provider** is set to `OpenAI`."
+        },
+        {
+            "name": "azureEndpoint",
+            "type": "string",
+            "label": "Azure OpenAI Endpoint",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Specify the HTTPS endpoint of your Azure OpenAI resource (e.g. `https://my-resource.openai.azure.com`). Required when **AI Provider** is set to `Azure OpenAI`."
+        },
+        {
+            "name": "azureDeployment",
+            "type": "string",
+            "label": "Azure OpenAI Deployment Name",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Provide the deployment name configured in Azure OpenAI (for example, `gpt-4o`). This is required when using the Azure OpenAI provider."
+        },
+        {
+            "name": "azureApiVersion",
+            "type": "string",
+            "label": "Azure OpenAI API Version",
+            "defaultValue": "2024-02-15-preview",
+            "required": false,
+            "helpMarkDown": "Set the API version to call for Azure OpenAI (defaults to `2024-02-15-preview`). Use the version that matches your deployment requirements."
         },
         {
             "name": "bugs",
