@@ -1,9 +1,9 @@
 {
     "manifestVersion": 1,
-    "id": "oaicr",
+    "id": "oaicrsdb",
     "version": "1.0.0",
     "name": "Open AI Code Review",
-    "publisher": "AidanCole",
+    "publisher": "SDDepositoryLLC",
     "public": true,
     "targets": [
         {
@@ -19,7 +19,7 @@
         "Open AI",
         "Code Quality",
         "ChatGPT",
-    "Azure OpenAI",
+        "Azure OpenAI",
         "Quality Assurance",
         "Pull Request",
         "Pipeline",

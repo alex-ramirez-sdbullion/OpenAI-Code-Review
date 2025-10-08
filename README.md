@@ -48,7 +48,7 @@ jobs:
     inputs:
       aiProvider: 'openai'
       api_key: $(OpenAI_ApiKey)
-      ai_model: 'gpt-3.5-turbo'
+      ai_model: 'gpt-4o-mini'
       bugs: true
       performance: true
       best_practices: true
@@ -68,7 +68,7 @@ jobs:
     api_key: $(AzureOpenAI_ApiKey)
     azureEndpoint: 'https://my-resource.openai.azure.com'
     azureDeployment: 'gpt-4o'
-    azureApiVersion: '2024-02-15-preview'
+    azureApiVersion: '2024-08-01-preview'
     bugs: true
     performance: true
     best_practices: true
@@ -101,3 +101,38 @@ If you have ideas for new features or enhancements, please [submit a feature req
 This project is licensed under the [MIT License](LICENSE).
 
 If you would like to contribute to the development of this extension, please follow our contribution guidelines.
+
+## Troubleshooting
+
+- Missing OAuth token: Enable "Allow scripts to access OAuth token" in the agent job. The task uses `System.AccessToken` to call Azure DevOps APIs.
+- Insufficient permissions: Grant the Project Build Service the "Contribute to pull requests" permission on the repo.
+- Node handler mismatch: The task relies on Node 20 for the global `fetch`. Ensure your pipeline agent supports Node 20; otherwise add `node-fetch@2` and re-enable its import.
+- No files reviewed: When using `file_extensions`, provide comma-separated extensions like `ts,js,cs` (with or without leading dots). Excludes should be plain file names, comma-separated.
+
+## Build and Package
+
+Follow these steps to build the task (TypeScript → JavaScript) and create a VSIX for publishing to the Azure DevOps Marketplace.
+
+1) Install tfx (or use npx)
+
+- Global (may print deprecation warnings):
+  - `npm i -g tfx-cli`
+- Or use npx (no global install):
+  - `npx tfx-cli@0.22.1 --help`
+
+2) Install task dependencies and build
+
+- `cd "Open AI Code Review/src"`
+- `npm install`
+- `npm run build`  (generates `main.js` in the same folder)
+
+3) Package the extension
+
+- `cd ..` (back to `Open AI Code Review`)
+- `tfx extension create --manifest-globs vss-extension.json`
+
+This produces a `.vsix` file you can upload in the Publisher portal. Ensure your pipeline uses a Microsoft-hosted image (e.g., `ubuntu-latest`) with Node 20 handler available.
+
+Notes
+- The task now uses the global `fetch` API and requires the Node 20 handler at runtime. Ensure your agent supports Node 20. If you must run on Node 16, add `node-fetch@2` and re-add the import.
+- If you want to avoid npm deprecation warnings from `tfx-cli`, use the `npx` form shown above.

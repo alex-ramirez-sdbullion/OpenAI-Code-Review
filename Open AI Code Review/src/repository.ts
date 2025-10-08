@@ -1,5 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import { SimpleGit, SimpleGitOptions, simpleGit } from "simple-git";
+import * as path from "path";
 import binaryExtensions from "./binaryExtensions.json";
 
 export class Repository {
@@ -24,16 +25,34 @@ export class Repository {
 
         let diffs = await this._repository.diff([targetBranch, '--name-only', '--diff-filter=AM']);
         let files = diffs.split('\n').filter(line => line.trim().length > 0);
-        let filesToReview = files.filter(file => !binaryExtensions.includes(file.slice((file.lastIndexOf(".") - 1 >>> 0) + 2)));
+
+        const isBinaryExt = (file: string) => {
+            const ext = path.extname(file).slice(1).toLowerCase();
+            if (!ext) return false;
+            return binaryExtensions.some(be => be.toLowerCase() === ext);
+        };
+
+        let filesToReview = files.filter(file => !isBinaryExt(file));
 
         if(fileExtensions) {
-            let fileExtensionsToInclude = fileExtensions.trim().split(',');
-            filesToReview = filesToReview.filter(file => fileExtensionsToInclude.includes(file.substring(file.lastIndexOf('.'))));
+            const includeExts = fileExtensions
+                .split(',')
+                .map(e => e.trim())
+                .filter(e => e.length > 0)
+                .map(e => e.replace(/^\./, '').toLowerCase());
+
+            filesToReview = filesToReview.filter(file => {
+                const ext = path.extname(file).slice(1).toLowerCase();
+                return includeExts.length === 0 || includeExts.includes(ext);
+            });
         }
 
         if(filesToExclude) {
-            let fileNamesToExclude = filesToExclude.trim().split(',')
-            filesToReview = filesToReview.filter(file => !fileNamesToExclude.includes(file.split('/').pop()!.trim()))
+            const namesToExclude = filesToExclude
+                .split(',')
+                .map(n => n.trim().toLowerCase())
+                .filter(n => n.length > 0);
+            filesToReview = filesToReview.filter(file => !namesToExclude.includes(path.basename(file).toLowerCase()))
         }
 
         return filesToReview;

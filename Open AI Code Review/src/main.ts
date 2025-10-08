@@ -1,5 +1,5 @@
 import tl = require('azure-pipelines-task-lib/task');
-import { OpenAI } from 'openai';
+import OpenAI from 'openai';
 import { ChatGPT } from './chatgpt';
 import { Repository } from './repository';
 import { PullRequest } from './pullrequest';
@@ -99,7 +99,8 @@ export class Main {
 
             console.info(`Completed review of file ${fileToReview}`)
 
-            tl.setProgress((fileToReview.length / 100) * index, 'Performing Code Review');
+            const percent = Math.min(100, Math.round(((index + 1) / filesToReview.length) * 100));
+            tl.setProgress(percent, 'Performing Code Review');
         }
 
         tl.setResult(tl.TaskResult.Succeeded, "Pull Request reviewed.");

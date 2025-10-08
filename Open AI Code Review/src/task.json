@@ -5,7 +5,7 @@
     "friendlyName": "Open AI Code Review",
     "description": "Complete a Code Review using Open AI",
     "category": "Utility",
-    "author": "Aidan Cole",
+    "author": "Alexander Ramirez",
     "version": {
         "Major": 1,
         "Minor": 0,
@@ -35,25 +35,14 @@
         {
             "name": "ai_model",
             "type": "pickList",
-            "label": "Open AI API Model",
-            "defaultValue": "gpt-3.5-turbo",
+            "label": "OpenAI Model",
+            "defaultValue": "gpt-4o-mini",
             "options": {
-                "gpt-4-1106-preview": "gpt-4-1106-preview",
-                "gpt-4-vision-preview": "gpt-4-vision-preview",
-                "gpt-4": "gpt-4",
-                "gpt-4-0314": "gpt-4-0314",
-                "gpt-4-0613": "gpt-4-0613",
-                "gpt-4-32k": "gpt-4-32k",
-                "gpt-4-32k-0314": "gpt-4-32k-0314",
-                "gpt-4-32k-0613": "gpt-4-32k-0613",
-                "gpt-3.5-turbo-1106": "gpt-3.5-turbo-1106",
-                "gpt-3.5-turbo": "gpt-3.5-turbo",
-                "gpt-3.5-turbo-16k": "gpt-3.5-turbo-16k",
-                "gpt-3.5-turbo-0301": "gpt-3.5-turbo-0301",
-                "gpt-3.5-turbo-0613": "gpt-3.5-turbo-0613",
-                "gpt-3.5-turbo-16k-0613": "gpt-3.5-turbo-16k-0613"
+                "gpt-4o-mini": "gpt-4o-mini (fast, low cost)",
+                "gpt-4o": "gpt-4o (highest quality)",
+                "gpt-4-turbo": "gpt-4-turbo (compatibility)"
             },
-            "helpMarkDown": "## OpenAI API Model Configuration\n\nChoose the OpenAI model for code analysis. This setting is only used when **AI Provider** is set to `OpenAI`."
+            "helpMarkDown": "Choose the OpenAI model for analysis. For best cost/performance use `gpt-4o-mini`. Use `gpt-4o` for highest quality."
         },
         {
             "name": "azureEndpoint",
@@ -75,7 +64,7 @@
             "name": "azureApiVersion",
             "type": "string",
             "label": "Azure OpenAI API Version",
-            "defaultValue": "2024-02-15-preview",
+            "defaultValue": "2024-08-01-preview",
             "required": false,
             "helpMarkDown": "Set the API version to call for Azure OpenAI (defaults to `2024-02-15-preview`). Use the version that matches your deployment requirements."
         },
@@ -130,6 +119,9 @@
             "target": "main.js"
         },
         "Node16": {
+            "target": "main.js"
+        },
+        "Node20": {
             "target": "main.js"
         }
     }
